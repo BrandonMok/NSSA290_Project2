@@ -46,15 +46,26 @@ public class NSSAServer {
         
         // PORT
         System.out.print("Enter a Port: ");
-        int port = Integer.parseInt(scanner.nextLine());
+        String port = scanner.nextLine();
 
-        if(this.validatePort(port)){
+        while(!this.validate(port)){
+            System.out.print("Enter a Port: ");
+            port = scanner.nextLine();
+
+            if(port.toUpperCase().equals("EXIT")){
+                // close connection
+
+            }
+        }
+
+        int portNum = Integer.parseInt(port)
+        if(this.validatePort(portNum)){
             switch(commMethod){
                 case "TCP":
-                    tcp(port);
+                    tcp(portNum);
                     break;
                 case "UDP":
-                    udp(port);
+                    udp(portNum);
                     break;
             }
         }
