@@ -13,11 +13,9 @@ public class NSSAServer {
     private ServerSocket serverSocket = null;
 
     // Input/Output
+	private Scanner scanner = null;
     private Scanner scn = null;
     private PrintWriter pwt = null;
-
-    // Port
-    int port = 0;
 
 
     /**
@@ -31,14 +29,38 @@ public class NSSAServer {
      * Constructor
      */
     public NSSAServer(){
-        /**
-         * Create cmd interface here and handle user inputs
-         * When user enters port, use int port above to save it,
-         * bc can't pass varaible to class 
-         * 
-         * Need way to distinguish between UDP and TCP communication method chosen
-         */
+		scanner = new Scanner(System.in);
+		System.out.print("Enter a communication method (TCP or UDP): ");
+		String commMethod = scanner.nextLine().toUpperCase();
+		
+		while(commMethod.length() < 0 || commMethod.equals("") || !(commMethod.equals("TCP") || commMethod.equals("UDP")) ){
+			System.out.print("Enter a communication method: (TCP or UDP): ");
+            commMethod = scanner.nextLine();
+            
+            if(commMethod.equals("exit")){
+                // close connection!
+                
 
+            }
+        }
+        
+        // PORT
+        System.out.print("Enter a Port: ");
+        int port = Integer.parseInt(scanner.nextLine());
+
+        if(this.validatePort(port)){
+            switch(commMethod){
+                case "TCP":
+                    tcp(port);
+                    break;
+                case "UDP":
+                    udp(port);
+                    break;
+            }
+        }
+        else {
+            System.exit(0);
+        }
     }
 
 
@@ -51,6 +73,11 @@ public class NSSAServer {
      */
     class ServerThread extends Thread {
         private Socket clientSocket = null;
+		private int port = 0;
+		
+		public ServerThread(int _port){
+			this.port = _port;
+		}
 
         /**
          * run
@@ -81,8 +108,8 @@ public class NSSAServer {
                 }
 
 
-                // ClientConnection ct = new ClientConnection(clientSocket);
-                // ct.start();
+                ClientConnection ct = new ClientConnection(clientSocket);
+                ct.start();
             }
         }
     }
@@ -116,4 +143,46 @@ public class NSSAServer {
 
         }
     }
-}
+
+
+    /**
+     * tcp
+     * @param port
+     * TCP function to handle tcp connection/communication
+     */
+    private void tcp(int port){
+
+    }
+
+    /**
+     * udp
+     * @param port
+     * UDP function to handle UDP connection/communication
+     */
+    private void udp(int port){
+
+    }
+
+
+    /**
+     * validatePort
+     * @param port
+     * @return boolean
+     * Validates that the entered port is within the range of available ports
+     */
+    private boolean validatePort(int port){
+        try{
+            if(port < 0 || port > 655355){
+                System.out.print("Invalid port! Please enter a valid port!");
+                return false;
+            }
+
+            return true;
+        }
+        catch(NumberFormatException nfe){
+            System.out.print("Invalid port! Please enter a valid port!");
+            return false;
+        }
+    }
+
+}// NSSASERVER class
