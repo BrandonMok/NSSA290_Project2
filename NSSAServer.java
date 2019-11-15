@@ -1,6 +1,8 @@
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.sql.*;
+import java.text.*;
 
 /**
  * NSSAServer
@@ -8,15 +10,8 @@ import java.net.*;
  */
 
 public class NSSAServer {
-
-    // Socket
-    private ServerSocket serverSocket = null;
-
-    // Input/Output
-	private Scanner scanner = null;
-    private Scanner scn = null;
-    private PrintWriter pwt = null;
-
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private Datagram dSocket = null;
 
     /**
      * Main
@@ -29,7 +24,10 @@ public class NSSAServer {
      * Constructor
      */
     public NSSAServer(){
-		scanner = new Scanner(System.in);
+        // Scanner 
+        Scanner scanner = new Scanner(System.in);
+        
+        // TCP or UDP
 		System.out.print("Enter a communication method (TCP or UDP): ");
 		String commMethod = scanner.nextLine().toUpperCase();
 		
@@ -47,47 +45,47 @@ public class NSSAServer {
         // PORT
         System.out.print("Enter a Port: ");
         String port = scanner.nextLine();
+        int portNum = Integer.parseInt(port);
 
-        while(!this.validate(port)){
+        while(!this.validatePort(portNum)){
             System.out.print("Enter a Port: ");
             port = scanner.nextLine();
 
             if(port.toUpperCase().equals("EXIT")){
                 // close connection
-
+                closeConnection();
             }
         }
 
-        int portNum = Integer.parseInt(port)
         if(this.validatePort(portNum)){
             switch(commMethod){
                 case "TCP":
-                    tcp(portNum);
+                    tcp(portNum);   
                     break;
                 case "UDP":
                     udp(portNum);
                     break;
             }
+            new ServerThread(commMethod, portNum).start();
         }
         else {
             System.exit(0);
         }
     }
 
-
-
-
     /**
      * Server Thread
      * Class that will handle the connections with the client
-     * and extends Thread so can handle multiple connections
      */
     class ServerThread extends Thread {
+        private ServerSocket serverSocket = null;
         private Socket clientSocket = null;
-		private int port = 0;
-		
-		public ServerThread(int _port){
-			this.port = _port;
+        private String method = null;
+        private int port = 0;
+
+		public ServerThread(String _method, int _port){
+            this.method = _method.toUpperCase();
+            this.port = _port;
 		}
 
         /**
@@ -99,29 +97,37 @@ public class NSSAServer {
         public void run(){
             try {
                 // Open server socket to specified port by the user
-                serverSocket = new ServerSocket(port);
+                serverSocket = new ServerSocket(port); 
 
-                // System.out.println(""); // print necessar info IP address, port, etc,. 
+                // IP + Hostname of this server
+                InetAddress ia = new InetAddress().getLocalHost();
+                String ip = ia.getHostAddress();
+                String hostName = ia.getHostName();
+
+                // The server will print out IP address + hostname + TCP OR UDP + on the port
+                System.out.println("IP address: " + ip);
+                System.out.println("IP Hostname: " + hostName);
+                System.out.println("Running " + this.method + " on port " + this.port);
             }
             catch(IOException ioe){
                 ioe.printStackTrace();
             }
 
-
+            // while true, keep socket open for clients to connect !
             while(true){
                 try { 
                     clientSocket = serverSocket.accept();
-                    // System.out.println() // print necessar info IP address, port, etc,. 
+                    newClientConnection(clientSocket);
                 }
                 catch(IOException ioe){
                     ioe.printStackTrace();
                     return;
                 }
 
-
-                ClientConnection ct = new ClientConnection(clientSocket);
+                // Create client connection with the client
+                ClientConnection ct = new ClientConnection(this.method, this.port, clientSocket);
                 ct.start();
-            }
+            }// end while
         }
     }
 
@@ -132,38 +138,33 @@ public class NSSAServer {
      */
     class ClientConnection extends Thread {
         private Socket clientSocket = null;
+        private PrintWriter pwt = null;
+        private Scanner scn = null;
+        private String method = null;
+        private int port = 0;
         
-        public ClientConnection(Socket _clientSocket){
-            this.clientSocket = _clientSocket;
-        }
-
-        public void run(){
-            try {
-                // Setup scanner + printwriter to accept and send messages
+        public ClientConnection(String _method, int _port, Socket _clientSocket){
+            try{
+                this.method = _method;
+                this.port = _port;
+                this.clientSocket = _clientSocket;
                 scn = new Scanner(new InputStreamReader(clientSocket.getInputStream()));
                 pwt = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             }
             catch(IOException ioe){
                 ioe.printStackTrace();
             }
+        }
 
-
-            /**
-             * Handle communication
-             */
-
+        public void run(){
+            // try{
+            // }   
+            // catch(IOException ioe){
+            //     System.out.println("ERROR");
+            // }
         }
     }
 
-
-    /**
-     * tcp
-     * @param port
-     * TCP function to handle tcp connection/communication
-     */
-    private void tcp(int port){
-
-    }
 
     /**
      * udp
@@ -171,9 +172,97 @@ public class NSSAServer {
      * UDP function to handle UDP connection/communication
      */
     private void udp(int port){
+        try{
+            dSocket = new DatagramSocket(port); // connect 
+            serverInfo("UDP");                  // Print server info
 
+            boolean continue = true;
+            byte[] bufferArray = new byte[256]; // buffer used for datagram packet transmission!
+            while(continue){
+                // Keep looking for a packet/message to be sent from client to server
+                DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.size(), new InetAddress().getLocalHost(), port);
+                dSocket.receive(dp);
+
+                // Once server recieves a packet, then grab information for display
+                InetAddress senderIA = requestDP.getAddress();
+                String senderIP = requestDP.getHostAddress();
+                int senderPort = requestDP.getPort();
+
+                if(requestDP.getLength() > 0){
+                    String message = new String(requestDP.getData(), 0, requestDP.getLength());
+
+                    // Print msg on server side 
+                    String fullMsg = this.getTimeStamp() + " Sending to client: " 
+                                    + senderIP + " " + senderPort + " " + message + " " 
+                                    + "[ " + senderIA + "]";
+                    bufferArray = fullMsg.getBytes(); // store this message sent in bytes - used to echo back message to client!
+
+                    DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.size(), senderIA, senderPort);   // datagram packet to send back to client 
+                    dSocket.send(responseDP);
+
+                    bufferArray = new byte[256];    // after sending the datagram packet, clear its contents
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println("ERROR: couldn't establish connection with client for TCP!");
+        }
     }
 
+    /**
+     * serverInfo
+     * @param String, String, String, int
+     * Prints server info for startup after user entered all info
+     */
+    private void serverInfo(String method){
+        InetAddress ia = new InetAddress().getLocalHost();  // machine of server's inetaddress
+        String ip = ia.getHostAddress();                    // IP
+        String hostName = ia.getHostName();                 // HostName
+
+        // The server will print out IP address + hostname + TCP OR UDP + on the port
+        System.out.println("IP address: " + ip);
+        System.out.println("IP Hostname: " + hostName);
+        System.out.println("Running " + method + " on port " + port);
+    }
+
+        /**
+     * tcp
+     * @param port
+     * TCP function to handle tcp connection/communication
+     */
+    // private void tcp(int port){
+    //     try{
+    //         new ServerThread(port);
+    //     }
+    //     catch(IOException ioe){
+    //         System.out.println("ERROR: couldn't establish connection with client for TCP!");
+    //     }
+    // }
+
+
+    /**
+     * getTimeStamp
+     * @return String
+     * Gets and returns the current timestamp
+     */
+    private String getTimeStamp(){
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String formatedTS = "[" + sdf.format(timestamp.getTime()) + "] ";
+        return formatedTS;
+    }
+
+    /**
+     * newClientConnection
+     * @param Socket
+     * @return String
+     * Method accepts a client socket, gets timestamp, and returns entire string
+     */
+    private String newClientConnection(Socket cSocket){
+        String ts = this.getTimeStamp();
+        String clientIP = cSocket.getRemoteSocketAddress().toString();
+        String newLine = ts + clinetIPl
+        return newLine;
+    }
 
     /**
      * validatePort
@@ -193,6 +282,21 @@ public class NSSAServer {
         catch(NumberFormatException nfe){
             System.out.print("Invalid port! Please enter a valid port!");
             return false;
+        }
+    }
+
+
+    /**
+     * closeConnection
+     * Closes connections for TCP
+     */
+    private void closeConnection(){
+        try {
+            pwt.close();
+            scn.close();
+        }
+        catch(IOException ioe){
+            System.out.println(ioe);
         }
     }
 
