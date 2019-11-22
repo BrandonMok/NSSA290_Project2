@@ -11,7 +11,7 @@ import java.text.*;
 
 public class NSSAServer {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private Datagram dSocket = null;
+    private DatagramSocket dSocket = null;
 
     /**
      * Main
@@ -60,7 +60,7 @@ public class NSSAServer {
         if(this.validatePort(portNum)){
             switch(commMethod){
                 case "TCP":
-                    tcp(portNum);   
+//                    tcp(portNum);   
                     break;
                 case "UDP":
                     udp(portNum);
@@ -100,7 +100,8 @@ public class NSSAServer {
                 serverSocket = new ServerSocket(port); 
 
                 // IP + Hostname of this server
-                InetAddress ia = new InetAddress().getLocalHost();
+//                InetAddress ia = new InetAddress().getLocalHost();	<- format is not the right one
+                InetAddress ia = InetAddress.getLocalHost();
                 String ip = ia.getHostAddress();
                 String hostName = ia.getHostName();
 
@@ -136,10 +137,14 @@ public class NSSAServer {
      * ClientConnection
      * Thread that's instantiated when the client connects to the server socket.
      */
+    
+//    move pwt and scn outside the class is because the closeConnection method need it..
+    private PrintWriter pwt = null;
+    private Scanner scn = null;
+    
     class ClientConnection extends Thread {
         private Socket clientSocket = null;
-        private PrintWriter pwt = null;
-        private Scanner scn = null;
+        
         private String method = null;
         private int port = 0;
         
@@ -174,18 +179,19 @@ public class NSSAServer {
     private void udp(int port){
         try{
             dSocket = new DatagramSocket(port); // connect 
-            serverInfo("UDP");                  // Print server info
+            serverInfo("UDP",port);                  // Print server info
 
-            boolean continue = true;
+            boolean continue1 = true;
             byte[] bufferArray = new byte[256]; // buffer used for datagram packet transmission!
-            while(continue){
+            while(continue1){
                 // Keep looking for a packet/message to be sent from client to server
-                DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.size(), new InetAddress().getLocalHost(), port);
-                dSocket.receive(dp);
+                DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
+                dSocket.receive(requestDP);
 
                 // Once server recieves a packet, then grab information for display
                 InetAddress senderIA = requestDP.getAddress();
-                String senderIP = requestDP.getHostAddress();
+//                String senderIP = requestDP.getHostAddress();
+                String senderIP = senderIA.getHostAddress();
                 int senderPort = requestDP.getPort();
 
                 if(requestDP.getLength() > 0){
@@ -197,7 +203,7 @@ public class NSSAServer {
                                     + "[ " + senderIA + "]";
                     bufferArray = fullMsg.getBytes(); // store this message sent in bytes - used to echo back message to client!
 
-                    DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.size(), senderIA, senderPort);   // datagram packet to send back to client 
+                    DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client 
                     dSocket.send(responseDP);
 
                     bufferArray = new byte[256];    // after sending the datagram packet, clear its contents
@@ -213,9 +219,11 @@ public class NSSAServer {
      * serverInfo
      * @param String, String, String, int
      * Prints server info for startup after user entered all info
+     * @throws UnknownHostException 
      */
-    private void serverInfo(String method){
-        InetAddress ia = new InetAddress().getLocalHost();  // machine of server's inetaddress
+//    Add the method (..,int port) is because it need it on line 233
+    private void serverInfo(String method,int port) throws UnknownHostException{
+        InetAddress ia = InetAddress.getLocalHost();  // machine of server's inetaddress
         String ip = ia.getHostAddress();                    // IP
         String hostName = ia.getHostName();                 // HostName
 
@@ -260,7 +268,7 @@ public class NSSAServer {
     private String newClientConnection(Socket cSocket){
         String ts = this.getTimeStamp();
         String clientIP = cSocket.getRemoteSocketAddress().toString();
-        String newLine = ts + clinetIPl
+        String newLine = ts + clientIP;
         return newLine;
     }
 
@@ -290,14 +298,11 @@ public class NSSAServer {
      * closeConnection
      * Closes connections for TCP
      */
+    
+//    no need the try catch
     private void closeConnection(){
-        try {
-            pwt.close();
-            scn.close();
-        }
-        catch(IOException ioe){
-            System.out.println(ioe);
-        }
+        pwt.close();
+		scn.close();
     }
 
 }// NSSASERVER class
