@@ -1,3 +1,5 @@
 # Compiled class file
 *.class
 *.docx
+*.iml
+*.idea
