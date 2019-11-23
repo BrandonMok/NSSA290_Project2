@@ -14,19 +14,6 @@ public class NSSAClient {
      * Main
      */
     public static void main(String[] args){
-    	InetAddress a;
-		try {
-			InetAddress hostName = InetAddress.getLocalHost();
-			String a1 = hostName.getHostAddress();
-			
-			System.out.println(a1);
-			System.out.println(hostName);
-			System.exit(0);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
         new NSSAClient();
         
     }
@@ -55,14 +42,14 @@ public class NSSAClient {
     	
     	switch(type) {
 	    	case "udp":
-	    			Udp(port);
+	    			new UDPClient(port);	//call the class UDPClient.java
 	    		break;
 	    	case "tcp":
-	    			Tcp(port);
+//	    			Tcp(port);
 	    		break;
     	}
     }
-
+// the code below would be clean up after
 
     /**
      * Tcp
@@ -91,6 +78,15 @@ public class NSSAClient {
     		System.out.println("buf:"+buf);
     		dp = new DatagramPacket(buf,buf.length,InetAddress.getLocalHost(),port);
     		ds.send(dp);
+    		while(true) {
+	    		byte[] receBuf = new byte[1024];
+	    		DatagramPacket recePacket = new DatagramPacket(receBuf,receBuf.length);
+	    		ds.receive(recePacket);
+
+	    		String receStr = new String(recePacket.getData(),0,recePacket.getLength());
+	    		System.out.println("receive from server:"+receStr);
+	//    		String serverInfo = recePacket.getAddress();
+    		}
     	}catch(Exception e) {
     		e.printStackTrace();
     	}

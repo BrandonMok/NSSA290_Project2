@@ -45,7 +45,7 @@ public class NSSAServer {
         System.out.println("Enter a Port: ");
         String port = scanner.nextLine();
 
-        while(this.validatePort(Integer.parseInt(port))){
+        while(!this.validatePort(Integer.parseInt(port))){
             System.out.println("Enter a Port: ");
             port = scanner.nextLine();
 
@@ -119,6 +119,7 @@ public class NSSAServer {
      * UDP function to handle UDP connection/communication
      */
     private void udp(int port){
+    	DatagramSocket dSocket = null;
         try{
             dSocket = new DatagramSocket(port); // connect 
             serverInfo("UDP",port);                  // Print server info
@@ -130,6 +131,9 @@ public class NSSAServer {
                 DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
                 dSocket.receive(requestDP);
 
+//              server receive the message from client
+                String receStr = new String(requestDP.getData(),0,requestDP.getLength());
+                System.out.println("Server recevie from client:"+receStr);
                 // Once server recieves a packet, then grab information for display
                 InetAddress senderIA = requestDP.getAddress();
 //                String senderIP = requestDP.getHostAddress();
