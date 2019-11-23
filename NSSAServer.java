@@ -8,10 +8,8 @@ import java.text.*;
  * NSSAServer
  * @author Brandon Mok, Tyler Pache, WeiBin Yang
  */
-
 public class NSSAServer {
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private DatagramSocket dSocket = null;
+    public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * Main
@@ -25,116 +23,59 @@ public class NSSAServer {
      * Constructor
      */
     public NSSAServer(){
-        // Scanner 
+        // Scanner
         Scanner scanner = new Scanner(System.in);
         
         // TCP or UDP
-		System.out.print("Enter a communication method (TCP or UDP): ");
-		String commMethod = scanner.nextLine().toUpperCase();
+        System.out.println("Enter a communication method (TCP or UDP): ");
+        String commMethod = scanner.nextLine().toUpperCase();
 		
-		while(commMethod.length() < 0 || commMethod.equals("") || !(commMethod.equals("TCP") || commMethod.equals("UDP")) ){
-			System.out.print("Enter a communication method: (TCP or UDP): ");
-            commMethod = scanner.nextLine();
-            
-            if(commMethod.equals("exit")){
-                // close connection!
-                
+        while(commMethod.length() < 0 || commMethod.equals("") || !(commMethod.equals("TCP") || commMethod.equals("UDP")) ){
+            System.out.println("Enter a communication method (TCP or UDP): ");
+            commMethod = scanner.nextLine().toUpperCase();
 
+            // If user typed EXIT, quit program -> user not connected to server yet, so just exit
+            if(commMethod.equals("EXIT")){
+                System.out.println("Goodbye!");
+                System.exit(0);
             }
         }
         
         // PORT
-        System.out.print("Enter a Port: ");
+        System.out.println("Enter a Port: ");
         String port = scanner.nextLine();
-        int portNum = Integer.parseInt(port);
 
-        while(!this.validatePort(portNum)){
-            System.out.print("Enter a Port: ");
+        while(this.validatePort(Integer.parseInt(port))){
+            System.out.println("Enter a Port: ");
             port = scanner.nextLine();
 
             if(port.toUpperCase().equals("EXIT")){
-                // close connection
-                closeConnection();
+                System.out.println("Goodbye!");
+                System.exit(0);
             }
         }
 
-        if(this.validatePort(portNum)){
+        // Validate port then
+        if(this.validatePort(Integer.parseInt(port))){
             switch(commMethod){
                 case "TCP":
-//                    tcp(portNum);   
+                    TCPServer tcps = new TCPServer(Integer.parseInt(port));
                     break;
                 case "UDP":
-                    udp(portNum);
+                    UDPServer udps = new UDPServer(Integer.parseInt(port));
                     break;
             }
-            new ServerThread(commMethod, portNum).start();
         }
         else {
+            System.out.println("ERROR: Invalid port number!");
             System.exit(0);
         }
     }
 
-    /**
-     * Server Thread
-     * Class that will handle the connections with the client
-     */
-    class ServerThread extends Thread {
-        private ServerSocket serverSocket = null;
-        private Socket clientSocket = null;
-        private String method = null;
-        private int port = 0;
-
-		public ServerThread(String _method, int _port){
-            this.method = _method.toUpperCase();
-            this.port = _port;
-		}
-
-        /**
-         * run
-         * @return void
-         * Run() is called as part of being a thread
-         * Run() is called by calling .start() 
-         */
-        public void run(){
-            try {
-                // Open server socket to specified port by the user
-                serverSocket = new ServerSocket(port); 
-
-                // IP + Hostname of this server
-//                InetAddress ia = new InetAddress().getLocalHost();	<- format is not the right one
-                InetAddress ia = InetAddress.getLocalHost();
-                String ip = ia.getHostAddress();
-                String hostName = ia.getHostName();
-
-                // The server will print out IP address + hostname + TCP OR UDP + on the port
-                System.out.println("IP address: " + ip);
-                System.out.println("IP Hostname: " + hostName);
-                System.out.println("Running " + this.method + " on port " + this.port);
-            }
-            catch(IOException ioe){
-                ioe.printStackTrace();
-            }
-
-            // while true, keep socket open for clients to connect !
-            while(true){
-                try { 
-                    clientSocket = serverSocket.accept();
-                    newClientConnection(clientSocket);
-                }
-                catch(IOException ioe){
-                    ioe.printStackTrace();
-                    return;
-                }
-
-                // Create client connection with the client
-                ClientConnection ct = new ClientConnection(this.method, this.port, clientSocket);
-                ct.start();
-            }// end while
-        }
-    }
 
 
     /**
+<<<<<<< HEAD
      * ClientConnection
      * Thread that's instantiated when the client connects to the server socket.
      */
@@ -274,6 +215,8 @@ public class NSSAServer {
     }
 
     /**
+=======
+>>>>>>> fbe9ed8fe98f343cca53930619030790d7bb91fd
      * validatePort
      * @param port
      * @return boolean
@@ -285,7 +228,6 @@ public class NSSAServer {
                 System.out.print("Invalid port! Please enter a valid port!");
                 return false;
             }
-
             return true;
         }
         catch(NumberFormatException nfe){
@@ -293,17 +235,4 @@ public class NSSAServer {
             return false;
         }
     }
-
-
-    /**
-     * closeConnection
-     * Closes connections for TCP
-     */
-    
-//    no need the try catch
-    private void closeConnection(){
-        pwt.close();
-		scn.close();
-    }
-
 }// NSSASERVER class
