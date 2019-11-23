@@ -20,6 +20,7 @@ public class NSSAServer {
         new NSSAServer();
     }
 
+
     /**
      * Constructor
      */
@@ -211,7 +212,7 @@ public class NSSAServer {
             }
         }
         catch(Exception e){
-            System.out.println("ERROR: couldn't establish connection with client for TCP!");
+            System.out.println("ERROR: couldn't establish connection with client for UDP!");
         }
     }
 
