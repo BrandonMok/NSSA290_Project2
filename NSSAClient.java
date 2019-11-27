@@ -46,10 +46,13 @@ public class NSSAClient {
 	    		break;
 	    	case "tcp":
 //	    			Tcp(port);
+	    		new TCPClient(port);
 	    		break;
     	}
     }
-// the code below would be clean up after
+/**
+ * the code below would be clean up
+ */
 
     /**
      * Tcp
