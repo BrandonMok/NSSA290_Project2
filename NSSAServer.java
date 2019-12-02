@@ -75,11 +75,9 @@ public class NSSAServer {
 
 
     /**
-<<<<<<< HEAD
      * ClientConnection
      * Thread that's instantiated when the client connects to the server socket.
      */
-    
 //    move pwt and scn outside the class is because the closeConnection method need it..
     private PrintWriter pwt = null;
     private Scanner scn = null;
@@ -133,10 +131,9 @@ public class NSSAServer {
 
 //              server receive the message from client
                 String receStr = new String(requestDP.getData(),0,requestDP.getLength());
-                System.out.println("Server recevie from client:"+receStr);
+                System.out.println("Server received from client:"+receStr);
                 // Once server recieves a packet, then grab information for display
                 InetAddress senderIA = requestDP.getAddress();
-//                String senderIP = requestDP.getHostAddress();
                 String senderIP = senderIA.getHostAddress();
                 int senderPort = requestDP.getPort();
 
@@ -179,21 +176,6 @@ public class NSSAServer {
         System.out.println("Running " + method + " on port " + port);
     }
 
-        /**
-     * tcp
-     * @param port
-     * TCP function to handle tcp connection/communication
-     */
-    // private void tcp(int port){
-    //     try{
-    //         new ServerThread(port);
-    //     }
-    //     catch(IOException ioe){
-    //         System.out.println("ERROR: couldn't establish connection with client for TCP!");
-    //     }
-    // }
-
-
     /**
      * getTimeStamp
      * @return String
@@ -219,8 +201,6 @@ public class NSSAServer {
     }
 
     /**
-=======
->>>>>>> fbe9ed8fe98f343cca53930619030790d7bb91fd
      * validatePort
      * @param port
      * @return boolean
