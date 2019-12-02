@@ -45,6 +45,10 @@ import java.text.*;
                 DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
                 sSocket.receive(requestDP);
 
+//               receive the message from client 
+                String receStr = new String(requestDP.getData(),0,requestDP.getLength());
+	    		System.out.println("receive from client:"+receStr);
+	    		
                 // Once server recieves a packet, then grab information for display
                 InetAddress senderIA = requestDP.getAddress();
                 String senderIP = senderIA.getHostAddress();
