@@ -1,7 +1,7 @@
-import java.util.*;
+import java.util.Scanner;
 import java.io.*;
 import java.net.*;
-import java.sql.*;
+import java.sql.Timestamp;
 import java.text.*;
 
 /**
@@ -107,8 +107,7 @@ public class TCPServer implements ServerConstants {
              try{
                  String msg = null;
                  while(scn.hasNextLine()){  // while there's something to read
-                 
-					      msg = scn.nextLine();  // store message
+                     msg = scn.nextLine();  // store message
 
                      String fullMsg = "Recieved from client: " + getTimeStamp() + " " + clientSocket.getInetAddress().getHostAddress() + " " + msg;
                      System.out.println(fullMsg);

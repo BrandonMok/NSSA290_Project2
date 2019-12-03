@@ -1,15 +1,19 @@
-import java.util.*;
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.text.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.Scanner;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.net.UnknownHostException;
 
 /**
  * UDP Server
  * @author Brandon Mok, Tyler Pache, WeiBin Yang
  */
  public class UDPServer implements ServerConstants {
+    // Date formatter used for timestamp
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    // DatagramSocket used for UDP communication
     private DatagramSocket sSocket = null;
     private int port = 0;
 
@@ -19,7 +23,6 @@ import java.text.*;
      */
 	public UDPServer(int _port){
 		this.port = _port;
-		
 		try {
 			sSocket = new DatagramSocket(port); // setup DatagramSocket
 			serverInfo(port);                   // Print server info
@@ -45,15 +48,16 @@ import java.text.*;
                 DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
                 sSocket.receive(requestDP);
 
-//               receive the message from client 
-                String receStr = new String(requestDP.getData(),0,requestDP.getLength());
-	    		System.out.println("receive from client:"+receStr);
+                // Receieved from client
+                String receStr = new String(requestDP.getData(), 0, requestDP.getLength());
+	    		System.out.println(getTimeStamp() + "Received from client: " + receStr);
 	    		
                 // Once server recieves a packet, then grab information for display
                 InetAddress senderIA = requestDP.getAddress();
                 String senderIP = senderIA.getHostAddress();
                 int senderPort = requestDP.getPort();
 
+                // if packet has information
                 if(requestDP.getLength() > 0){
                     String message = new String(requestDP.getData(), 0, requestDP.getLength());
 
@@ -63,6 +67,7 @@ import java.text.*;
                             + "[ " + senderIA + "]";
                     bufferArray = fullMsg.getBytes(); // store this message sent in bytes - used to echo back message to client!
 
+                    // Return response back to client
                     DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client
                     sSocket.send(responseDP);
 
@@ -79,6 +84,7 @@ import java.text.*;
      * serverInfo
      * @param String, String, String, int
      * Prints server info for startup after user entered all info
+     * @throws UnknownHostException
      */
     public void serverInfo(int port) throws UnknownHostException {
         InetAddress ia = InetAddress.getLocalHost();        // machine of server's inetaddress
@@ -90,7 +96,6 @@ import java.text.*;
         System.out.println("IP Hostname: " + hostName);
         System.out.println("Running UDP on port: " + port);
     }
-
 
     /**
      * getTimeStamp
