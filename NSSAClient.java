@@ -55,6 +55,9 @@ public class NSSAClient {
 	    	case "tcp":
 	    		new TCPClient(port);	// calls TCPClient.java
 	    		break;
+	    	default:
+	    		System.out.println("invalid type, please try again");
+	    		break;
     	}
     }
 

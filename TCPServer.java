@@ -108,7 +108,7 @@ public class TCPServer implements ServerConstants {
                  String msg = null;
                  while(scn.hasNextLine()){  // while there's something to read
                      msg = scn.nextLine();  // store message
-
+                     
                      String fullMsg = "Recieved from client: " + getTimeStamp() + " " + clientSocket.getInetAddress().getHostAddress() + " " + msg;
                      System.out.println(fullMsg);
 

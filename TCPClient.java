@@ -10,7 +10,9 @@ public class TCPClient {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private Scanner in = null;		// scanner to read STDIN
 	private int port = 0;
-
+	private Socket s = null;
+	private OutputStream os = null;
+	private InputStream input = null;
 	/**
 	 * Constructor
 	 * @param port
@@ -29,41 +31,34 @@ public class TCPClient {
 		this.port = port;
 		
 		try {
+			
 			System.out.println(InetAddress.getLocalHost());
-			Socket s = new Socket(InetAddress.getLocalHost(),port);
-			
-			OutputStream os = s.getOutputStream();
-			
-			System.out.println("Enter a message to send: ");
-			String msg = in.next();
-			os.write(msg.getBytes());
-			
+			String msg = "";
+			do{
+				s = new Socket(InetAddress.getLocalHost(),port);
+				
+				os = s.getOutputStream();
+				input = s.getInputStream();
+				
+				System.out.println("Enter a message to send: (or type 'exit' to exit the port)");
+				msg = in.next();
+				os.write(msg.getBytes());
+				os.flush();
+				s.shutdownOutput();
+				
+//				receive the message from server
+				byte[] data = new byte[1024];
+				int serverMsgData = input.read(data);
+				String serverMsg = new String(data,0,serverMsgData);
+				System.out.println("Receive the message from server:"+serverMsg);
+				s.shutdownInput();
+			}while(!msg.toLowerCase().equals("exit"));
 			os.close();
+			input.close();
+			s.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-
-
-	/**
-	 * validatePort
-	 * @param port
-	 * @return boolean
-	 * Validates that the entered port is within the range of available ports
-	 */
-	private boolean validatePort(int port){
-		try{
-			boolean valid = true;
-			if(port < 0 || port > 655355){
-				System.out.print("Invalid port! Please enter a valid port!");
-				valid = false;
-			}
-			return valid;
-		}
-		catch(NumberFormatException nfe){
-			System.out.print("Invalid port! Please enter a valid port!");
-			return false;
 		}
 	}
 }
