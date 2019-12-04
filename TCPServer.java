@@ -1,7 +1,7 @@
-import java.util.*;
+import java.util.Scanner;
 import java.io.*;
 import java.net.*;
-import java.sql.*;
+import java.sql.Timestamp;
 import java.text.*;
 
 /**
@@ -65,7 +65,7 @@ public class TCPServer implements ServerConstants {
             while(true){
                 try {
                     clientSocket = serverSocket.accept();
-                    newClientConnection(clientSocket);
+                    newClientConnection(this.clientSocket);      // print information
                 }
                 catch(IOException ioe){
                     ioe.printStackTrace();
@@ -104,18 +104,29 @@ public class TCPServer implements ServerConstants {
         }
 
         public void run(){
-//             try{
-//                 boolean continue1 = true;
-//                 while(continue1){
-//                     /**
-//                      * Handle message transmission
-//                      * Handle EXIT when client is done with application (i.e. sends EXIT or possbily they close the application
-//                      */
-//                 }
-//             }
-//             catch(IOException ioe){
-//                 System.out.println("ERROR: " + ioe.getMessage());
-//             }
+             try{
+                 String msg = null;
+                 while(scn.hasNextLine()){  // while there's something to read
+                     msg = scn.nextLine();  // store message
+                     
+                     String fullMsg = "Recieved from client: " + getTimeStamp() + " " + clientSocket.getInetAddress().getHostAddress() + " " + msg;
+                     System.out.println(fullMsg);
+
+                     pwt.println(msg); // echo - send back message
+                     pwt.flush();
+                     
+
+                     // EXIT - disconnect the client
+                     if(msg.toLowerCase().equals("exit")){
+                         scn.close();
+                         pwt.close();
+                         clientSocket.close();
+                     }
+                 }
+             }
+             catch(IOException ioe){
+                 System.out.println("ERROR: " + ioe.getMessage());
+             }
         }
     }
 
