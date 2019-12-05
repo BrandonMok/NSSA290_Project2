@@ -63,7 +63,7 @@ public class NSSAClient {
 	    		new UDPClient(port, ipHostname);	// calls UDPClient.java
 	    		break;
 	    	case "tcp":
-	    		new TCPClient(port);	// calls TCPClient.java
+	    		new TCPClient(port, ipHostname);	// calls TCPClient.java
 	    		break;
 	    	default:
 	    		System.out.println("Invalid port!");

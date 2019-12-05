@@ -86,7 +86,7 @@ public class UDPClient {
         System.out.println("Connecting to " + ipHost + " with IP address " + serverAddress + " using UDP");
         System.out.println("on port " + port + " at " + this.getTimeStamp());
         System.out.println("----------------------------------------");
-        System.out.println("Enter a message or type 'exit' to disconnect from the server");
+        System.out.println("Enter a message or type 'exit' to disconnect from the server.\n");
     }
 
 	/**

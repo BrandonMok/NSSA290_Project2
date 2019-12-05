@@ -17,9 +17,9 @@ public class TCPClient {
 	 * Constructor
 	 * @param port
 	 */
-	public TCPClient(int port) {
+	public TCPClient(int port, String ipHostName) {
 		in = new Scanner(System.in);	// intialize scanner
-		connect(port);					// connect to TCPServer
+		connect(port, ipHostName);		// connect to TCPServer
 	}
 
 	/**
@@ -27,20 +27,21 @@ public class TCPClient {
 	 * @param port
 	 * Connects to TCPServer and handles data communication
 	 */
-	public void connect(int port) {
+	public void connect(int port, String ipHostName) {
 		this.port = port;
 		
 		try {
-			
-			System.out.println(InetAddress.getLocalHost());
+         clientInfo(ipHostName, port); // print client connection info
+			//System.out.println(InetAddress.getLocalHost());
 			String msg = "";
+         
 			do{
-				s = new Socket(InetAddress.getLocalHost(),port);
+				s = new Socket(InetAddress.getLocalHost(), port);
 				
 				os = s.getOutputStream();
 				input = s.getInputStream();
 				
-				System.out.println("Enter a message to send: (or type 'exit' to exit the port)");
+            // Read in msg
 				msg = in.next();
 				os.write(msg.getBytes());
 				os.flush();
@@ -50,9 +51,11 @@ public class TCPClient {
 				byte[] data = new byte[1024];
 				int serverMsgData = input.read(data);
 				String serverMsg = new String(data,0,serverMsgData);
-				System.out.println("Receive the message from server:"+serverMsg);
+				System.out.println(serverMsg + "\n");
 				s.shutdownInput();
 			}while(!msg.toLowerCase().equals("exit"));
+         
+         // Close connections
 			os.close();
 			input.close();
 			s.close();
@@ -60,5 +63,38 @@ public class TCPClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+   
+   
+   
+    /**
+     * clientInfo
+     * @param String, int
+     * ipHost of server to connect to & port to connect on
+     * Prints Client information as to connecting to the server
+     * @throws UnknownHostException
+     */
+    public void clientInfo(String ipHost, int port) throws UnknownHostException {
+        // Client prints information pertaining to connecting to the server
+        InetAddress serverAddress = InetAddress.getByName(ipHost);
+        
+        //Connecting to [IP address/hostname] with IP address [IP address] using [protocol] on Port [port number] at [timestamp]
+        // The server will print out IP address + hostname + TCP OR UDP + on the port
+        System.out.println("----------------------------------------");
+        System.out.println("Connecting to " + ipHost + " with IP address " + serverAddress + " using TCP");
+        System.out.println("on port " + port + " at " + this.getTimeStamp());
+        System.out.println("----------------------------------------");
+        System.out.println("Enter a message or type 'exit' to disconnect from the server.\n");
+    }
+    
+   /**
+	 * getTimeStamp
+	 * @return String
+	 * Gets and returns the current timestamp
+	 */
+	public String getTimeStamp() {
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		String formatedTS = "[" + sdf.format(timestamp.getTime()) + "] ";
+		return formatedTS;
 	}
 }
