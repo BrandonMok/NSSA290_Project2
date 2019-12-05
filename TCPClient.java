@@ -32,11 +32,10 @@ public class TCPClient {
 		
 		try {
          clientInfo(ipHostName, port); // print client connection info
-			//System.out.println(InetAddress.getLocalHost());
 			String msg = "";
          
 			do{
-				s = new Socket(InetAddress.getLocalHost(), port);
+				s = new Socket(InetAddress.getByName(ipHostName), port); // setup socket w/Server (uses Server IP entered)
 				
 				os = s.getOutputStream();
 				input = s.getInputStream();
