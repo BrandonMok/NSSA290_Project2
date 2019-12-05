@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.Scanner;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.net.UnknownHostException;
 
 /**
  * UDPClient
@@ -20,12 +21,12 @@ public class UDPClient {
 	 * UDPClient
 	 * @param port
 	 */
-	public UDPClient(int port) {
+	public UDPClient(int port, String ipHost) {
 		// initialize scanner
 		in = new Scanner(System.in);
 
 		// connect to server passing in port
-		connect(port);
+		connect(port, ipHost);
 	}
 
 	/*
@@ -33,35 +34,60 @@ public class UDPClient {
 	 * @param port
 	 * Connects and handles data communication with server
 	 */
-	public void connect(int port) {
+	public void connect(int port, String ipHost) {
 		DatagramSocket ds = null;
 		DatagramPacket dp = null;
     	try {
-    		ds = new DatagramSocket();
+    		ds = new DatagramSocket(); 
+         clientInfo(ipHost,port);   // Print client information 
     		
     		String msg = "";
     		do {
     			// MSG to SEND
-    			System.out.println("Enter a message to send (or 'exit' to disconnect from the server):");
     			msg = in.nextLine();
 
 	//    		sending the message to the server
 	    		byte[] buf = msg.getBytes();
-	    		dp = new DatagramPacket(buf,buf.length,InetAddress.getLocalHost(),port);
+	    		dp = new DatagramPacket(buf, buf.length, InetAddress.getLocalHost(), port);
 	    		ds.send(dp);
     		
 	//	    	receive the message from server
 	    		byte[] receBuf = new byte[1024];
-	    		DatagramPacket recePacket = new DatagramPacket(receBuf,receBuf.length);
+	    		DatagramPacket recePacket = new DatagramPacket(receBuf, receBuf.length);
 	    		ds.receive(recePacket);
-	    		String receStr = new String(recePacket.getData(),0,recePacket.getLength());
-	    		System.out.println(getTimeStamp() + "Received from server: " + receStr);
+	    		String receStr = new String(recePacket.getData(), 0, recePacket.getLength());
+	    		System.out.println(receStr + "\n");
     		}while(!msg.toLowerCase().equals("exit"));
-
+         
+         // Close connection
+         in.close();    // scanner close
+         ds.close();    // datagram socket close
+         System.exit(0);// exit program
     	}catch(Exception e) {
     		e.printStackTrace();
     	}
 	}
+   
+
+    /**
+     * clientInfo
+     * @param String, int
+     * ipHost of server to connect to & port to connect on
+     * Prints Client information as to connecting to the server
+     * @throws UnknownHostException
+     */
+    public void clientInfo(String ipHost, int port) throws UnknownHostException {
+        // Client prints information pertaining to connecting to the server
+        InetAddress serverAddress = InetAddress.getByName(ipHost);
+        
+        //Connecting to [IP address/hostname] with IP address [IP address] using [protocol] on Port [port number] at [timestamp]
+        // The server will print out IP address + hostname + TCP OR UDP + on the port
+        System.out.println("----------------------------------------");
+        System.out.println("Connecting to " + ipHost + " with IP address " + serverAddress + " using UDP");
+        System.out.println("on port " + port + " at " + this.getTimeStamp());
+        System.out.println("----------------------------------------");
+        System.out.println("Enter a message or type 'exit' to disconnect from the server");
+    }
 
 	/**
 	 * getTimeStamp
@@ -72,26 +98,5 @@ public class UDPClient {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String formatedTS = "[" + sdf.format(timestamp.getTime()) + "] ";
 		return formatedTS;
-	}
-
-	/*
-	 * validatePort
-	 * @param port
-	 * @return boolean
-	 * Validates that the user entered port is within range of available ports
-	 */
-	private boolean validatePort(int port){
-		try{
-			boolean valid = true;
-			if(port < 0 || port > 655355){
-				System.out.print("Invalid port! Please enter a valid port!");
-				valid = false;
-			}
-			return valid;
-		}
-		catch(NumberFormatException nfe){
-			System.out.print("Invalid port! Please enter a valid port!");
-			return false;
-		}
 	}
 }

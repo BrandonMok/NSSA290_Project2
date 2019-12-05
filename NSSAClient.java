@@ -26,14 +26,24 @@ public class NSSAClient {
     public NSSAClient(){
     	// scanner to accept STDIN
     	in = new Scanner(System.in);
+      
+      // IP or hostname
+      System.out.println("Enter a IP or hostname of server: ");
+      String ipHostname = in.nextLine();
+      
+      // while ip or hostname not entered
+      while(ipHostname.equals("") || ipHostname == null){
+         System.out.println("Please enter a valid IP or hostname of server: ");
+         ipHostname = in.nextLine();
+      }
 
         // TCP or UDP
-    	System.out.println("Enter UDP or TCP:");
+    	System.out.println("Enter a communication method (UDP or TCP): ");
     	String type = in.nextLine().toLowerCase();
 
     	// while tcp or udp weren't entered, re-ask for valid comm method
     	while(!(type.equals("tcp") || type.equals("udp"))) {
-    		System.out.println("Enter UDP or TCP:");
+    		System.out.println("Enter a communication method (UDP or TCP): ");
     		type = in.nextLine().toLowerCase();
     	}
 
@@ -50,14 +60,14 @@ public class NSSAClient {
     	// Based on type of communication, call respective client for desired method
     	switch(type) {
 	    	case "udp":
-	    		new UDPClient(port);	// calls UDPClient.java
+	    		new UDPClient(port, ipHostname);	// calls UDPClient.java
 	    		break;
 	    	case "tcp":
 	    		new TCPClient(port);	// calls TCPClient.java
 	    		break;
 	    	default:
-	    		System.out.println("invalid type, please try again");
-	    		break;
+	    		System.out.println("Invalid port!");
+            System.exit(0);
     	}
     }
 
