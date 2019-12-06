@@ -37,11 +37,12 @@ public class TCPClient {
 			do{
 				s = new Socket(InetAddress.getByName(ipHostName), port); // setup socket w/Server (uses Server IP entered)
 				
+//				set the outputstream and inputstream
 				os = s.getOutputStream();
 				input = s.getInputStream();
-				
+
             // Read in msg
-				msg = in.next();
+				msg = in.nextLine();
 				os.write(msg.getBytes());
 				os.flush();
 				s.shutdownOutput();
