@@ -1,5 +1,5 @@
-import java.text.*;
-import java.net.*;
+import java.text.SimpleDateFormat;
+import java.net.UnknownHostException;
 
 /**
  * ServerConstants
@@ -9,6 +9,9 @@ public interface ServerConstants {
 
     // Date formatter
     public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    // UDPServer + TCPServer both need to display serverInfo
+    public void serverInfo(int port) throws UnknownHostException;
 
     // Timestamp
     public String getTimeStamp();

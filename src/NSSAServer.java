@@ -1,12 +1,10 @@
 import java.util.Scanner;
-import java.net.*;
 
 /**
  * NSSAServer
  * @author Brandon Mok, Tyler Pache, WeiBin Yang
  */
 public class NSSAServer {
-
     /**
      * Main
      */
@@ -46,7 +44,6 @@ public class NSSAServer {
             port = scanner.nextLine();
 
             if(port.toLowerCase().equals("exit")){
-                System.out.println("Goodbye!");
                 System.exit(0);
             }
         }
@@ -60,6 +57,9 @@ public class NSSAServer {
                 case "UDP":
                     new UDPServer(Integer.parseInt(port));
                     break;
+                default:
+                    System.out.println("Invalid communication method!");
+                    System.exit(0);
             }
         }
         else {

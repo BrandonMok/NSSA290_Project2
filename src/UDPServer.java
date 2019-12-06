@@ -1,7 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Scanner;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.net.UnknownHostException;
@@ -44,15 +43,15 @@ import java.net.UnknownHostException;
             byte[] bufferArray = new byte[256]; // buffer used for datagram packet transmission!
             
             while(true){
-                // RECEIVE
+                /** RECEIVE */
                 // Keep looking for a packet/message to be sent from client to server
                 DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
                 sSocket.receive(requestDP);
 
-                // Receieved from client
+                // Received from client
                 String receStr = new String(requestDP.getData(), 0, requestDP.getLength());
 	    		
-                // Once server recieves a packet, then grab information for display
+                // Once server receives a packet, then grab information for display
                 InetAddress senderIA = requestDP.getAddress();
                 String senderIP = senderIA.getHostAddress();
                 int senderPort = requestDP.getPort();
@@ -61,7 +60,7 @@ import java.net.UnknownHostException;
                 System.out.println(getTimeStamp() + senderIA + " " + receStr);
 
 
-                // SEND
+                /** SEND  */
                 String message = new String(requestDP.getData(), 0, requestDP.getLength());
 
                 // Print msg on server side
@@ -82,7 +81,7 @@ import java.net.UnknownHostException;
 
     /**
      * serverInfo
-     * @param int
+     * @param port
      * Prints server info for startup after user entered all info
      * @throws UnknownHostException
      */

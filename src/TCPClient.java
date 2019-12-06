@@ -8,17 +8,19 @@ import java.text.SimpleDateFormat;
 public class TCPClient {
 	// Date formatter for timestamp
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private Scanner in = null;		// scanner to read STDIN
-	private int port = 0;
-	private Socket s = null;
-	private OutputStream os = null;
-	private InputStream input = null;
+	private Scanner in = null;			// scanner to read STDIN
+	private Socket s = null;			// Socket to setup connection
+	private Scanner scn = null;			// Scanner to read from SERVER
+	private PrintWriter pwt = null;		// PrintWriter to send to SERVER
+	private int port = 0;				// port # entered by USER
+
+
 	/**
 	 * Constructor
 	 * @param port
 	 */
 	public TCPClient(int port, String ipHostName) {
-		in = new Scanner(System.in);	// intialize scanner
+		in = new Scanner(System.in);	// initialize scanner
 		connect(port, ipHostName);		// connect to TCPServer
 	}
 
@@ -29,47 +31,47 @@ public class TCPClient {
 	 */
 	public void connect(int port, String ipHostName) {
 		this.port = port;
-		
 		try {
-         clientInfo(ipHostName, port); // print client connection info
+         	clientInfo(ipHostName, port); // print client connection info
 			String msg = "";
-         
-			do{
-				s = new Socket(InetAddress.getByName(ipHostName), port); // setup socket w/Server (uses Server IP entered)
-				
-//				set the outputstream and inputstream
-				os = s.getOutputStream();
-				input = s.getInputStream();
 
-            // Read in msg
+			// Socket to connect w/server
+			s = new Socket(InetAddress.getByName(ipHostName), port);
+			pwt = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
+			scn = new Scanner(new InputStreamReader(s.getInputStream()));
+			System.out.println("Enter a message or type 'exit' to disconnect from the server.\n"); // PRINT here so only show if connection was successful!
+
+			do{
+				// Read in STDIN message
 				msg = in.nextLine();
-				os.write(msg.getBytes());
-				os.flush();
-				s.shutdownOutput();
-				
-//				receive the message from server
-				byte[] data = new byte[1024];
-				int serverMsgData = input.read(data);
-				String serverMsg = new String(data,0,serverMsgData);
-				System.out.println(serverMsg + "\n");
-				s.shutdownInput();
+				pwt.println(msg);
+				pwt.flush();
+
+				// if there's a message to read from server, display it
+				if(scn.hasNextLine()){
+					String fromServerMSG = scn.nextLine();
+					System.out.println(fromServerMSG);	// print msg from server
+				}
 			}while(!msg.toLowerCase().equals("exit"));
          
-         // Close connections
-			os.close();
-			input.close();
+         	// Close connections
+			pwt.close();
+			scn.close();
 			s.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			if(e instanceof ConnectException){
+				connectionFailed(port, ipHostName);
+			}
+
 			e.printStackTrace();
 		}
 	}
-   
+
    
    
     /**
      * clientInfo
-     * @param String, int
+     * @param ipHost, port
      * ipHost of server to connect to & port to connect on
      * Prints Client information as to connecting to the server
      * @throws UnknownHostException
@@ -84,7 +86,6 @@ public class TCPClient {
         System.out.println("Connecting to " + ipHost + " with IP address " + serverAddress + " using TCP");
         System.out.println("on port " + port + " at " + this.getTimeStamp());
         System.out.println("----------------------------------------");
-        System.out.println("Enter a message or type 'exit' to disconnect from the server.\n");
     }
     
    /**
@@ -96,5 +97,19 @@ public class TCPClient {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String formatedTS = "[" + sdf.format(timestamp.getTime()) + "] ";
 		return formatedTS;
+	}
+
+	/**
+	 * ConnectionFailed
+	 * @param port
+	 * @param ip
+	 * Handles printing information of connection failure & exits program
+	 */
+	private void connectionFailed(int port, String ip){
+		System.out.println("----------------------------------------");
+		System.out.println("Connection to " + ip + " on port " + port + " failed!");
+		System.out.println("Make sure the server is running and the IP and port match that of the server!");
+		System.out.println("----------------------------------------");
+		System.exit(1);
 	}
 }
