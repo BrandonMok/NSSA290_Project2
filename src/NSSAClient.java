@@ -1,16 +1,10 @@
 import java.util.Scanner;
-import java.net.*;
 
 /**
  * NSSAClient
  * @author Brandon Mok, Tyler Pache, WeiBin Yang
  */
-
 public class NSSAClient {
-
-	// Scanner used to read in STDIN
-	private Scanner in = null;
-
     /**
      * Main
      */
@@ -24,20 +18,20 @@ public class NSSAClient {
 	 * Starts respective client for the desired communication method
      */
     public NSSAClient(){
-    	// scanner to accept STDIN
-    	in = new Scanner(System.in);
+    	// scanner to read/accept STDIN
+    	Scanner in = new Scanner(System.in);
       
-      // IP or hostname
-      System.out.println("Enter a IP or hostname of server: ");
-      String ipHostname = in.nextLine();
-      
-      // while ip or hostname not entered
-      while(ipHostname.equals("") || ipHostname == null){
-         System.out.println("Please enter a valid IP or hostname of server: ");
-         ipHostname = in.nextLine();
-      }
+        /** IP or HostName */
+        System.out.println("Enter a IP or hostname of server: ");
+        String ipHostname = in.nextLine();
 
-        // TCP or UDP
+        // while ip or hostname not entered
+        while(ipHostname.equals("") || ipHostname == null){
+            System.out.println("Please enter a valid IP or hostname of server: ");
+            ipHostname = in.nextLine();
+        }
+
+        /** TCP or UDP */
     	System.out.println("Enter a communication method (UDP or TCP): ");
     	String type = in.nextLine().toLowerCase();
 
@@ -47,7 +41,7 @@ public class NSSAClient {
     		type = in.nextLine().toLowerCase();
     	}
 
-    	// PORT
+    	/** PORT */
     	System.out.println("Enter port to connect:");
     	int port = in.nextInt();
     	
@@ -66,8 +60,8 @@ public class NSSAClient {
 	    		new TCPClient(port, ipHostname);	// calls TCPClient.java
 	    		break;
 	    	default:
-	    		System.out.println("Invalid port!");
-            System.exit(0);
+	    		System.out.println("Invalid communication method!");
+                System.exit(0);
     	}
     }
 
@@ -87,7 +81,7 @@ public class NSSAClient {
             return valid;
         }
         catch(NumberFormatException nfe){
-            System.out.print("Invalid port! Please enter a valid port!");
+            System.out.println("Invalid port! Please enter a valid port!");
             return false;
         }
     }

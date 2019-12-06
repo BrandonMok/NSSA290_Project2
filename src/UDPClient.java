@@ -39,7 +39,7 @@ public class UDPClient {
 		DatagramPacket dp = null;
     	try {
     		ds = new DatagramSocket(); 
-         clientInfo(ipHost,port);   // Print client information 
+         	clientInfo(ipHost,port);   // Print client information
     		
     		String msg = "";
     		do {
@@ -56,13 +56,13 @@ public class UDPClient {
 	    		DatagramPacket recePacket = new DatagramPacket(receBuf, receBuf.length);
 	    		ds.receive(recePacket);
 	    		String receStr = new String(recePacket.getData(), 0, recePacket.getLength());
-	    		System.out.println(receStr + "\n");
+	    		System.out.println(receStr);
     		}while(!msg.toLowerCase().equals("exit"));
          
-         // Close connection
-         in.close();    // scanner close
-         ds.close();    // datagram socket close
-         System.exit(0);// exit program
+			// Close connection
+			in.close();    // scanner close
+			ds.close();    // datagram socket close
+			System.exit(0);// exit program
     	}catch(Exception e) {
     		e.printStackTrace();
     	}
@@ -71,7 +71,7 @@ public class UDPClient {
 
     /**
      * clientInfo
-     * @param String, int
+     * @param ipHost, port
      * ipHost of server to connect to & port to connect on
      * Prints Client information as to connecting to the server
      * @throws UnknownHostException

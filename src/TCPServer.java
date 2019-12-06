@@ -2,7 +2,7 @@ import java.util.Scanner;
 import java.io.*;
 import java.net.*;
 import java.sql.Timestamp;
-import java.text.*;
+import java.text.SimpleDateFormat;
 
 /**
  * TCP Server
@@ -18,7 +18,6 @@ public class TCPServer implements ServerConstants {
      */
     public TCPServer(int _port){
         this.port = _port;
-
         try {
             serverInfo(port);
             new ServerThread(port).start();
@@ -39,7 +38,7 @@ public class TCPServer implements ServerConstants {
 
         /**
          * Constructor
-         * @param _method
+         * @param _port
          * @param _port
          */
         public ServerThread(int _port){
@@ -65,7 +64,6 @@ public class TCPServer implements ServerConstants {
             while(true){
                 try {
                     clientSocket = serverSocket.accept();
-                    newClientConnection(this.clientSocket);      // print information
                 }
                 catch(IOException ioe){
                     ioe.printStackTrace();
@@ -97,6 +95,7 @@ public class TCPServer implements ServerConstants {
                 this.clientSocket = _clientSocket;
                 scn = new Scanner(new InputStreamReader(clientSocket.getInputStream()));
                 pwt = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                System.out.println(newClientConnection(clientSocket));      // print information on client connection
             }
             catch(IOException ioe){
                 ioe.printStackTrace();
@@ -107,7 +106,7 @@ public class TCPServer implements ServerConstants {
              try{
                  String msg = null;
                  while(scn.hasNextLine()){  // while there's something to read
-                 		
+
                      msg = scn.nextLine();  // store message
                        
                      // Print msg from client
@@ -117,12 +116,10 @@ public class TCPServer implements ServerConstants {
                      String echo = getTimeStamp() + " " + msg;
                      pwt.println(echo);
                      pwt.flush();
-                     
 
                      // EXIT - disconnect the client
                      if(msg.toLowerCase().equals("exit")){
-//                          scn.close();
-//                          pwt.close();
+                         System.out.println(clientDisconnect(clientSocket));
                          clientSocket.close();
                      }
                  }
@@ -138,14 +135,25 @@ public class TCPServer implements ServerConstants {
 
     /**
      * newClientConnection
-     * @param Socket
+     * @param cSocket
      * @return String
      * Method accepts a client socket, gets timestamp, and returns entire string
      */
     private String newClientConnection(Socket cSocket){
         String ts = this.getTimeStamp();
-        String clientIP = cSocket.getRemoteSocketAddress().toString();
+        String clientIP = cSocket.getInetAddress().toString(); // was previously getRemoteSocketAddress()
         String newLine = ts + clientIP + " connected!";
+        return newLine;
+    }
+
+    /**
+     * clientDisconnect
+     * @param cSocket
+     * @return String
+     * Method returns msg of given client disconnecting
+     */
+    private String clientDisconnect(Socket cSocket){
+        String newLine = this.getTimeStamp() + cSocket.getInetAddress().toString() + " disconnected!";
         return newLine;
     }
 
