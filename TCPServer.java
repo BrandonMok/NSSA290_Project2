@@ -108,18 +108,20 @@ public class TCPServer implements ServerConstants {
                  String msg = null;
                  while(scn.hasNextLine()){  // while there's something to read
                      msg = scn.nextLine();  // store message
-                     
-                     String fullMsg = "Recieved from client: " + getTimeStamp() + " " + clientSocket.getInetAddress().getHostAddress() + " " + msg;
-                     System.out.println(fullMsg);
+                       
+                     // Print msg from client
+                     System.out.println(getTimeStamp() + this.clientSocket.getInetAddress().getHostAddress() + " " + msg);
 
-                     pwt.println(msg); // echo - send back message
+                     // echo msg back to client
+                     String echo = getTimeStamp() + " " + msg;
+                     pwt.println(echo);
                      pwt.flush();
                      
 
                      // EXIT - disconnect the client
                      if(msg.toLowerCase().equals("exit")){
-                         scn.close();
-                         pwt.close();
+//                          scn.close();
+//                          pwt.close();
                          clientSocket.close();
                      }
                  }
@@ -159,7 +161,7 @@ public class TCPServer implements ServerConstants {
 
     /**
      * serverInfo
-     * @param String, String, String, int
+     * @param port
      * Prints server info for startup after user entered all info
      * @throws UnknownHostException
      */
@@ -169,17 +171,10 @@ public class TCPServer implements ServerConstants {
         String hostName = ia.getHostName();                 // HostName
 
         // The server will print out IP address + hostname + TCP OR UDP + on the port
+        System.out.println("----------------------------------------");
         System.out.println("IP address: " + ip);
         System.out.println("IP Hostname: " + hostName);
         System.out.println("Running TCP on port: " + port);
-    }
-
-    /**
-     * closeConnection
-     * Closes connections for TCP
-     */
-    private void closeConnection(){
-        pwt.close();
-        scn.close();
+        System.out.println("----------------------------------------");
     }
 }

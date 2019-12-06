@@ -23,16 +23,16 @@ public class NSSAServer {
         Scanner scanner = new Scanner(System.in);
         
         // TCP or UDP
-        System.out.println("Enter a communication method (TCP or UDP): ");
+        System.out.println("Enter a communication method (UDP or TCP): ");
         String commMethod = scanner.nextLine().toUpperCase();
 		
         while(commMethod.length() < 0 || commMethod.equals("") || !(commMethod.equals("TCP") || commMethod.equals("UDP")) ){
-            System.out.println("Enter a communication method (TCP or UDP): ");
+            System.out.println("Enter a communication method (UDP or TCP): ");
             commMethod = scanner.nextLine().toUpperCase();
 
             // If user typed EXIT, quit program -> user not connected to server yet, so just exit
             if(commMethod.equals("EXIT")){
-                System.out.println("Goodbye!");
+
                 System.exit(0);
             }
         }

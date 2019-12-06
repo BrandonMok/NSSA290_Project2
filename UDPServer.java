@@ -44,35 +44,35 @@ import java.net.UnknownHostException;
             byte[] bufferArray = new byte[256]; // buffer used for datagram packet transmission!
             
             while(true){
+                // RECEIVE
                 // Keep looking for a packet/message to be sent from client to server
                 DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
                 sSocket.receive(requestDP);
 
                 // Receieved from client
                 String receStr = new String(requestDP.getData(), 0, requestDP.getLength());
-	    		System.out.println(getTimeStamp() + "Received from client: " + receStr);
 	    		
                 // Once server recieves a packet, then grab information for display
                 InetAddress senderIA = requestDP.getAddress();
                 String senderIP = senderIA.getHostAddress();
                 int senderPort = requestDP.getPort();
+                
+                // Print information from client on serverside ([Timestamp][MSG][Sender IP])
+                System.out.println(getTimeStamp() + senderIA + " " + receStr);
 
-                // if packet has information
-                if(requestDP.getLength() > 0){
-                    String message = new String(requestDP.getData(), 0, requestDP.getLength());
 
-                    // Print msg on server side
-                    String fullMsg = this.getTimeStamp() + " Sending to client: "
-                            + senderIP + " " + senderPort + " " + message + " "
-                            + "[ " + senderIA + "]";
-                    bufferArray = fullMsg.getBytes(); // store this message sent in bytes - used to echo back message to client!
+                // SEND
+                String message = new String(requestDP.getData(), 0, requestDP.getLength());
 
-                    // Return response back to client
-                    DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client
-                    sSocket.send(responseDP);
+                // Print msg on server side
+                String fullMsg = this.getTimeStamp() + message;
+                bufferArray = fullMsg.getBytes(); // store this message sent in bytes - used to echo back message to client!
 
-                    bufferArray = new byte[256];    // after sending the datagram packet, clear its contents
-                }
+                // Return response back to client
+                DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client
+                sSocket.send(responseDP);
+
+                bufferArray = new byte[256];    // after sending the datagram packet, clear its contents
             }
         }
         catch(Exception e){
@@ -82,7 +82,7 @@ import java.net.UnknownHostException;
 
     /**
      * serverInfo
-     * @param String, String, String, int
+     * @param int
      * Prints server info for startup after user entered all info
      * @throws UnknownHostException
      */
@@ -92,9 +92,11 @@ import java.net.UnknownHostException;
         String hostName = ia.getHostName();                 // HostName
 
         // The server will print out IP address + hostname + TCP OR UDP + on the port
+        System.out.println("----------------------------------------");
         System.out.println("IP address: " + ip);
         System.out.println("IP Hostname: " + hostName);
         System.out.println("Running UDP on port: " + port);
+        System.out.println("----------------------------------------");
     }
 
     /**
