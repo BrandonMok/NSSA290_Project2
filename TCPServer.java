@@ -107,6 +107,7 @@ public class TCPServer implements ServerConstants {
              try{
                  String msg = null;
                  while(scn.hasNextLine()){  // while there's something to read
+                 		
                      msg = scn.nextLine();  // store message
                        
                      // Print msg from client
