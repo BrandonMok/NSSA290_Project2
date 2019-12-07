@@ -38,7 +38,7 @@ public class UDPClient {
 		DatagramSocket ds = null;
 		DatagramPacket dp = null;
     	try {
-    		ds = new DatagramSocket(); 
+    		ds = new DatagramSocket();
          	clientInfo(ipHost,port);   // Print client information
     		
     		String msg = "";
@@ -48,8 +48,9 @@ public class UDPClient {
 
 	//    		sending the message to the server
 	    		byte[] buf = msg.getBytes();
-	    		dp = new DatagramPacket(buf, buf.length, InetAddress.getLocalHost(), port);
-	    		ds.send(dp);
+	    		//dp = new DatagramPacket(buf, buf.length, InetAddress.getLocalHost(), port);
+				dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(ipHost), port);
+				ds.send(dp);
     		
 	//	    	receive the message from server
 	    		byte[] receBuf = new byte[1024];

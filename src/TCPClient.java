@@ -32,14 +32,15 @@ public class TCPClient {
 	public void connect(int port, String ipHostName) {
 		this.port = port;
 		try {
-         	clientInfo(ipHostName, port); // print client connection info
 			String msg = "";
 
 			// Socket to connect w/server
 			s = new Socket(InetAddress.getByName(ipHostName), port);
-			pwt = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
-			scn = new Scanner(new InputStreamReader(s.getInputStream()));
-			System.out.println("Enter a message or type 'exit' to disconnect from the server.\n"); // PRINT here so only show if connection was successful!
+			pwt = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));		// printWriter
+			scn = new Scanner(new InputStreamReader(s.getInputStream()));			// scanner - read from server
+
+			clientInfo(ipHostName, port); // print client connection info
+
 
 			do{
 				// Read in STDIN message
@@ -86,6 +87,7 @@ public class TCPClient {
         System.out.println("Connecting to " + ipHost + " with IP address " + serverAddress + " using TCP");
         System.out.println("on port " + port + " at " + this.getTimeStamp());
         System.out.println("----------------------------------------");
+		System.out.println("Enter a message or type 'exit' to disconnect from the server.\n"); // PRINT here so only show if connection was successful!
     }
     
    /**
