@@ -45,7 +45,8 @@ import java.net.UnknownHostException;
             while(true){
                 /** RECEIVE */
                 // Keep looking for a packet/message to be sent from client to server
-                DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
+                //DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length, InetAddress.getLocalHost(), port);
+                DatagramPacket requestDP = new DatagramPacket(bufferArray, bufferArray.length);
                 sSocket.receive(requestDP);
 
                 // Received from client
@@ -68,6 +69,7 @@ import java.net.UnknownHostException;
                 bufferArray = fullMsg.getBytes(); // store this message sent in bytes - used to echo back message to client!
 
                 // Return response back to client
+                //DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client
                 DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client
                 sSocket.send(responseDP);
 
