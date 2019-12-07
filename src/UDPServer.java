@@ -69,7 +69,6 @@ import java.net.UnknownHostException;
                 bufferArray = fullMsg.getBytes(); // store this message sent in bytes - used to echo back message to client!
 
                 // Return response back to client
-                //DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client
                 DatagramPacket responseDP = new DatagramPacket(bufferArray, bufferArray.length, senderIA, senderPort);   // datagram packet to send back to client
                 sSocket.send(responseDP);
 
@@ -94,7 +93,7 @@ import java.net.UnknownHostException;
 
         // The server will print out IP address + hostname + TCP OR UDP + on the port
         System.out.println("----------------------------------------");
-        System.out.println("IP address: " + ip);
+        System.out.println("IP Address: " + ip);
         System.out.println("IP Hostname: " + hostName);
         System.out.println("Running UDP on port: " + port);
         System.out.println("----------------------------------------");

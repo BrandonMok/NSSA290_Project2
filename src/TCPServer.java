@@ -181,7 +181,7 @@ public class TCPServer implements ServerConstants {
 
         // The server will print out IP address + hostname + TCP OR UDP + on the port
         System.out.println("----------------------------------------");
-        System.out.println("IP address: " + ip);
+        System.out.println("IP Address: " + ip);
         System.out.println("IP Hostname: " + hostName);
         System.out.println("Running TCP on port: " + port);
         System.out.println("----------------------------------------");
