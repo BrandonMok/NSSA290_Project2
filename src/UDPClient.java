@@ -22,11 +22,8 @@ public class UDPClient {
 	 * @param port
 	 */
 	public UDPClient(int port, String ipHost) {
-		// initialize scanner
-		in = new Scanner(System.in);
-
-		// connect to server passing in port
-		connect(port, ipHost);
+		in = new Scanner(System.in);// Initialize scanner to read STDIN
+		connect(port, ipHost);		// connect to UDP server
 	}
 
 	/*
@@ -40,7 +37,7 @@ public class UDPClient {
     	try {
     		ds = new DatagramSocket();
          	clientInfo(ipHost,port);   // Print client information
-    		
+
     		String msg = "";
     		do {
     			// MSG to SEND
@@ -48,10 +45,9 @@ public class UDPClient {
 
 	//    		sending the message to the server
 	    		byte[] buf = msg.getBytes();
-	    		//dp = new DatagramPacket(buf, buf.length, InetAddress.getLocalHost(), port);
 				dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(ipHost), port);
 				ds.send(dp);
-    		
+
 	//	    	receive the message from server
 	    		byte[] receBuf = new byte[1024];
 	    		DatagramPacket recePacket = new DatagramPacket(receBuf, receBuf.length);
@@ -59,7 +55,7 @@ public class UDPClient {
 	    		String receStr = new String(recePacket.getData(), 0, recePacket.getLength());
 	    		System.out.println(receStr);
     		}while(!msg.toLowerCase().equals("exit"));
-         
+
 			// Close connection
 			in.close();    // scanner close
 			ds.close();    // datagram socket close
